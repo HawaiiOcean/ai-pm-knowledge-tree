@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f2">
+  <meta name="description" content="一棵为 AI 产品经理生长的知识树。从 LLM 原理，到 RAG、Agent、评测与产品设计，用交互地图建立技术心智模型。">
+  <title>知枝 · AI 产品知识树</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#map">跳到知识地图</a>
+  <header class="header">
+    <a href="#" class="brand" aria-label="知枝首页"><span class="brand-icon">♧</span><span>知枝<span class="brand-en">AI KNOWLEDGE TREE</span></span></a>
+    <nav class="top-nav" aria-label="主导航"><button class="nav-tab active" data-view="tree">知识地图</button><button class="nav-tab" data-view="routes">学习路线</button><button class="nav-tab" data-view="review">我的复习 <span id="saved-count">0</span></button></nav>
+    <div class="header-actions"><button class="search-trigger" id="search-open"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>搜索知识点</span><kbd>/</kbd></button><a class="github-link" href="https://github.com/HawaiiOcean/ai-pm-knowledge-tree" target="_blank" rel="noopener noreferrer" aria-label="GitHub 项目"><svg viewBox="0 0 24 24" width="21" height="21" fill="currentColor" aria-hidden="true"><path d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.76-.24.76-.54v-2.08c-3.12.68-3.78-1.33-3.78-1.33-.51-1.3-1.25-1.64-1.25-1.64-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 1.72 2.62 1.22 3.26.93.1-.73.39-1.22.71-1.5-2.49-.28-5.11-1.24-5.11-5.54 0-1.23.44-2.23 1.15-3.02-.11-.29-.5-1.43.11-2.98 0 0 .94-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.55.22 2.69.11 2.98.72.79 1.15 1.79 1.15 3.02 0 4.31-2.62 5.26-5.12 5.54.4.35.76 1.03.76 2.08v3.08c0 .3.2.65.77.54A11.2 11.2 0 0 0 12 .8Z"/></svg></a></div>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar">
+      <div class="sidebar-top"><span class="eyebrow">YOUR LEARNING GARDEN</span><h1>让知识，<br>长成一棵树。</h1><p>从理解模型，到做出好产品。<br>每一次探索，都向上生长一点。</p></div>
+      <div class="sidebar-section"><span class="section-label">探索方式</span><button class="side-link selected" id="explore-all"><span>⌘</span> 自由探索 <span class="small-arrow">↗</span></button><button class="side-link" id="start-learning"><span>↟</span> 从根系开始</button><button class="side-link" id="route-shortcut"><span>⇢</span> 按场景学习</button></div>
+      <div class="sidebar-section domains"><span class="section-label">知识分支 <span>10</span></span><div id="branch-nav"></div></div>
+      <div class="growth-card"><div class="growth-top"><span>我的生长记录</span><span class="sprout">♧</span></div><strong id="progress-count">0 <small>/ 0 个知识点</small></strong><div class="progress-track"><div id="progress-bar"></div></div><p id="progress-caption">今天，种下第一个知识点。</p><button id="export-progress">导出学习记录 ↗</button><button id="import-progress">导入记录</button><input id="import-file" type="file" accept="application/json,.json" hidden></div>
+      <p class="sidebar-foot">好产品，始于清晰的理解。<br><span>为 AI 产品经理而生 · v1.0</span></p>
+    </aside>
+    <section class="main-area" aria-label="知识学习工作区">
+      <div class="map-heading"><div><div class="eyebrow">FROM FOUNDATIONS TO POSSIBILITIES</div><h2 id="view-title">AI 产品经理的技术全景<span class="beta">持续生长中</span></h2><p id="view-subtitle">根系是原理，枝干是能力，树冠是你能创造的产品。</p></div><button class="outline-button" id="guide-open">如何探索 ↗</button></div>
+      <div class="map-toolbar"><div class="view-switch" role="group" aria-label="地图视图"><button class="active" id="tree-view">♧ 知识树</button><button id="list-view">☷ 知识清单</button></div><div class="map-meta"><span class="live-dot"></span><span id="total-label"></span><span class="meta-separator">/</span><span>10 个知识领域</span></div><button id="route-clear" class="text-button" hidden>退出路线 ×</button></div>
+      <div id="route-banner" class="route-banner" hidden></div>
+      <div id="map" class="map-viewport" tabindex="0" aria-label="可缩放的知识树，用方向键平移，点击知识点阅读">
+        <div class="map-canvas" id="map-canvas"><svg id="tree-lines" viewBox="0 0 1440 1480" aria-hidden="true"></svg><div id="tree-nodes"></div><div class="tree-root-label"><span>从这里扎根</span><strong>LLM FUNDAMENTALS</strong><p>理解模型怎样工作，才能知道怎样把它用好。</p></div></div>
+        <div class="map-top-note"><span>✧</span> 每一片叶子，都是一个新的理解</div>
+      </div>
+      <div id="list-content" hidden></div><div id="routes-content" hidden></div><div id="review-content" hidden></div>
+      <footer class="map-footer"><div class="legend"><span><i class="state-new"></i>未学习</span><span><i class="state-read"></i>已阅读</span><span><i class="state-mastered"></i>自测通过</span><span><i class="state-saved">◇</i>已收藏</span></div><div class="zoom-controls"><button id="zoom-out" aria-label="缩小">−</button><span id="zoom-label">100%</span><button id="zoom-in" aria-label="放大">＋</button><span class="control-divider"></span><button id="fit-map" aria-label="适应窗口" title="适应窗口"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div><span class="map-hint">拖动画布探索 · 点击节点学习</span></footer>
+    </section>
+  </main>
+  <div id="reader-backdrop" class="reader-backdrop" hidden></div>
+  <aside id="reader" class="reader" role="dialog" aria-modal="true" aria-label="知识点详情" hidden><div class="reader-topbar"><span id="reader-breadcrumb"></span><div><button id="share-node" title="复制知识点链接" aria-label="复制知识点链接">↗</button><button id="bookmark-node" title="收藏" aria-label="收藏知识点">◇</button><button id="reader-close" title="关闭" aria-label="关闭详情">×</button></div></div><div id="reader-content" class="reader-content"></div></aside>
+  <dialog id="search-dialog"><div class="search-box"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search-input" placeholder="搜索概念、英文术语或产品问题…" autocomplete="off" aria-label="搜索知识点"><button id="search-close" aria-label="关闭搜索">Esc</button></div><div id="search-results"></div><p class="search-tip">中英文都可以搜 · 点击结果进入知识点</p></dialog>
+  <dialog id="guide-dialog"><button class="dialog-close" id="guide-close" aria-label="关闭探索指南">×</button><span class="eyebrow">A SMALL GUIDE</span><h2>欢迎来到你的知识花园。</h2><p>从底部的 LLM 基础扎根，沿着枝干探索，把技术理解带进真实的产品工作。</p><ol><li><strong>看全貌</strong>：拖动画布、缩放地图，或切换清单快速查找。</li><li><strong>学一个概念</strong>：点击叶子，阅读解释、案例与 PM 追问。</li><li><strong>走一条路线</strong>：选择知识库或智能体场景，按顺序学习。</li><li><strong>检验理解</strong>：完成自测，点亮节点；收藏薄弱点供面试复习。</li></ol><p class="guide-note">树的位置代表学习结构，不代表系统执行顺序。安全、评测和工程能力需要贯穿产品全程。进度保存在当前浏览器，可导出备份。</p><button class="primary-button" id="guide-start">开始扎根 ↗</button></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

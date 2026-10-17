@@ -1,0 +1,15 @@
+{
+  "name": "ai-pm-knowledge-tree",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "从 LLM 根系到 AI 产品树冠的交互式中文知识树",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test",
+    "build": "node scripts/check.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}
