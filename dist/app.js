@@ -1,5 +1,6 @@
 import {groups,nodes,routes,nodeById,groupById,sources,updatedAt} from './content.js';
 import {STORAGE_KEY,sanitizeProgress,searchNodes} from './state.js';
+import {treeLayout,treeSize} from './tree-layout.js';
 
 const $ = selector=>document.querySelector(selector);
 const $$ = selector=>[...document.querySelectorAll(selector)];
@@ -47,60 +48,54 @@ function markRead(node) {
   if(!progress.status[node.id]) { progress.status[node.id]='read'; saveProgress(); }
 }
 function stateLabel(id) { return progress.status[id]==='mastered'?'✓ 自测通过':progress.status[id]==='read'?'已阅读':'待探索'; }
-function leafMarkup(node) {
-  return `<button class="leaf ${progress.status[node.id]||''} ${progress.bookmarks.includes(node.id)?'saved':''} ${currentNode?.id===node.id?'selected':''} ${activeRoute?.ids.includes(node.id)?'route-node':''}" data-node="${node.id}" aria-label="${escape(node.title)}，${stateLabel(node.id)}">${escape(node.title)}</button>`;
-}
 function renderTree() {
-  $('#tree-nodes').innerHTML=groups.map(group=>`<section class="branch-card ${activeRoute&&!groupNodes(group.id).some(node=>activeRoute.ids.includes(node.id))?'dimmed':''}" id="branch-${group.id}" style="left:${group.x}px;top:${group.y}px;--branch:${group.color}"><button class="branch-title" data-group="${group.id}"><span class="branch-symbol">${group.symbol}</span>${group.title}<span class="branch-number">${group.number}</span></button><div class="branch-en">${group.en}</div><p class="branch-description">${group.description}</p><button class="overview-expand" data-expand="${group.id}">${groupNodes(group.id).length} 个知识点 <span>展开叶子 ↗</span></button><div class="leaf-list">${groupNodes(group.id).map(leafMarkup).join('')}</div></section>`).join('');
+  $('#tree-nodes').innerHTML=groups.map(group=>{
+    const position=treeLayout[group.id];
+    const members=groupNodes(group.id);
+    const read=members.filter(node=>progress.status[node.id]).length;
+    const mastered=members.every(node=>progress.status[node.id]==='mastered');
+    const dimmed=activeRoute&&!members.some(node=>activeRoute.ids.includes(node.id));
+    const shape=position.side==='left'?'M248 113 C148 151 5 109 12 13 C147 -7 244 25 248 113Z':'M12 113 C112 151 255 109 248 13 C113 -7 16 25 12 113Z';
+    const vein=position.side==='left'?'M245 112 Q144 64 34 28':'M15 112 Q116 64 226 28';
+    return `<button class="chapter-leaf ${position.side} ${read?'read':''} ${mastered?'mastered':''} ${dimmed?'dimmed':''}" id="branch-${group.id}" data-group="${group.id}" style="left:${position.x-130}px;top:${position.y-70}px;--leaf-fill:${position.fill};--leaf-stroke:${position.stroke}" aria-label="${escape(group.title)}，${members.length} 个知识点，已阅读 ${read} 个"><svg viewBox="0 0 260 140" aria-hidden="true"><path class="leaf-shape" d="${shape}"/><path class="leaf-vein" d="${vein}"/></svg><span>${escape(group.title)}</span></button>`;
+  }).join('');
   $('#branch-nav').innerHTML=groups.map(group=>`<button class="branch-nav-item" data-locate="${group.id}" style="--branch:${group.color}"><span class="branch-dot"></span>${group.title}<span class="branch-nav-count">${groupNodes(group.id).length}</span></button>`).join('');
 }
 function renderLines() {
-  const branches=[
-    ['M720 1310 C660 1240 685 1140 720 1080', '#a5b797',7],
-    ['M720 1100 C780 1060 960 1200 1010 1185','#c3b59b',4],
-    ['M720 1120 C720 1030 720 1000 720 935','#a2b88d',7],
-    ['M720 895 C620 875 555 875 425 875','#9bbbad',5],
-    ['M720 895 C820 870 900 875 1015 875','#c9b39a',5],
-    ['M720 900 C710 780 700 680 700 570','#b1c39f',7],
-    ['M715 800 C570 770 510 610 410 585','#b6c399',5],
-    ['M715 780 C850 720 900 610 1030 585','#a8bac7',5],
-    ['M700 565 C690 460 570 315 530 300','#c6bb95',5],
-    ['M700 565 C700 380 795 295 835 280','#9fb396',6],
-    ['M690 1240 C640 1310 560 1340 510 1340','#c3cdb5',2],
-    ['M695 1280 C670 1335 635 1360 615 1360','#c3cdb5',2],
-    ['M725 1260 C770 1320 845 1345 910 1345','#c3cdb5',2],
-    ['M720 1290 C740 1350 780 1360 800 1360','#c3cdb5',2],
-  ];
-  $('#tree-lines').innerHTML=`<defs><radialGradient id="canopy"><stop offset="0" stop-color="#dce7cf" stop-opacity=".27"/><stop offset="1" stop-color="#dce7cf" stop-opacity="0"/></radialGradient></defs><ellipse cx="715" cy="640" rx="680" ry="590" fill="url(#canopy)"/>${branches.map(([d,color,width])=>`<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" opacity=".7"/>`).join('')}<g fill="#becdad" opacity=".7"><path d="M702 418q-39-49-43-14q3 23 43 14"/><path d="M712 722q37-49 43-18q-1 22-43 18"/><path d="M658 1067q-37-41-41-12q5 24 41 12"/><path d="M776 393q29-39 33-13q-4 17-33 13"/><path d="M568 711q-34-25-29-1q9 16 29 1"/></g><text x="720" y="70" text-anchor="middle" font-size="10" fill="#9daa90" letter-spacing="4" font-family="Georgia,serif">GROW YOUR UNDERSTANDING</text>`;
+  const branchPaths=Object.values(treeLayout).map(p=>{
+    const endX=p.x+(p.side==='left'?116:-116),endY=p.y+42;
+    return `<path d="M600 ${p.joint} C${p.side==='left'?540:660} ${p.joint-40} ${endX+(p.side==='left'?80:-80)} ${endY+45} ${endX} ${endY}" stroke-width="${p.width}"/>`;
+  });
+  $('#tree-lines').setAttribute('viewBox',`0 0 ${treeSize.width} ${treeSize.height}`);
+  $('#tree-lines').innerHTML=`<defs><linearGradient id="bark" x1="0" y1="1" x2=".2" y2="0"><stop stop-color="#9a8968"/><stop offset=".48" stop-color="#8c9974"/><stop offset="1" stop-color="#a6b68a"/></linearGradient><radialGradient id="tree-glow"><stop stop-color="#e4edd7" stop-opacity=".45"/><stop offset="1" stop-color="#e4edd7" stop-opacity="0"/></radialGradient></defs><ellipse cx="600" cy="505" rx="540" ry="470" fill="url(#tree-glow)"/><path d="M566 987 C587 866 581 737 585 640 C590 503 583 384 599 194 C618 363 610 503 617 640 C619 768 614 875 638 987 Q603 974 566 987Z" fill="url(#bark)"/><g fill="none" stroke="#95a47e" stroke-linecap="round">${branchPaths.join('')}</g><g fill="none" stroke="#b0b89c" stroke-linecap="round"><path d="M593 972 Q565 1011 493 1022 Q469 1025 452 1040" stroke-width="6"/><path d="M603 981 Q623 1017 691 1027 Q723 1031 741 1043" stroke-width="5"/><path d="M599 981 Q586 1027 565 1049" stroke-width="4"/><path d="M610 983 Q623 1028 652 1049" stroke-width="3"/><path d="M523 1018 Q515 1038 495 1047M679 1024 Q684 1044 706 1052" stroke-width="2"/></g><g fill="#b8c99a" opacity=".8"><path d="M584 274 Q541 276 545 240 Q575 239 584 274"/><path d="M616 456 Q655 455 659 420 Q627 419 616 456"/><path d="M582 661 Q540 658 537 625 Q570 624 582 661"/><path d="M622 838 Q662 838 668 805 Q633 805 622 838"/></g>`;
 }
 function applyTransform() {
   canvas.style.setProperty('--map-scale',transform.scale);
-  canvas.classList.toggle('overview',transform.scale<.65);
   canvas.style.transform=`translate(${transform.x}px,${transform.y}px) scale(${transform.scale})`;
   $('#zoom-label').textContent=`${Math.round(transform.scale*100)}%`;
 }
 function fitMap() {
   if(viewport.hidden) return;
   const width=viewport.clientWidth,height=viewport.clientHeight;
-  // 全树保持可见；文字太小时可点击分支导航或切换清单阅读。
-  transform.scale=Math.max(.18,Math.min((width-28)/1440,(height-25)/1480,1));
-  transform.x=(width-1440*transform.scale)/2;
-  transform.y=(height-1480*transform.scale)/2+3;
+  // 叶片与枝干使用同一坐标系等比例缩放，始终保留各章节间的间距。
+  transform.scale=Math.max(.12,Math.min((width-32)/treeSize.width,(height-28)/treeSize.height,1));
+  transform.x=(width-treeSize.width*transform.scale)/2;
+  transform.y=(height-treeSize.height*transform.scale)/2;
   applyTransform();
 }
 function zoom(factor,cx=viewport.clientWidth/2,cy=viewport.clientHeight/2) {
-  const next=Math.min(1.6,Math.max(.18,transform.scale*factor));
+  const next=Math.min(1.6,Math.max(.12,transform.scale*factor));
   transform.x=cx-(cx-transform.x)*next/transform.scale;
   transform.y=cy-(cy-transform.y)*next/transform.scale;
   transform.scale=next; applyTransform();
 }
 function focusGroup(id) {
-  const group=groupById[id]; if(!group)return;
+  const group=treeLayout[id]; if(!group)return;
   if(activeView!=='tree'||listMode){ listMode=false;setView('tree'); }
   const width=viewport.clientWidth,height=viewport.clientHeight;
   transform.scale=Math.min(1.05,(width-35)/380,(height-35)/260);
-  transform.x=width/2-(group.x+165)*transform.scale;
-  transform.y=height/2-(group.y+105)*transform.scale;
+  transform.x=width/2-group.x*transform.scale;
+  transform.y=height/2-group.y*transform.scale;
   applyTransform();
 }
 function flowMarkup(flow) {

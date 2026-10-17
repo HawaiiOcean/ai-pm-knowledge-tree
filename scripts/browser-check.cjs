@@ -10,9 +10,14 @@ const {mkdir}=require('node:fs/promises');
   const base=process.env.PREVIEW_URL||'http://127.0.0.1:4173/';
   await mkdir('/tmp/zhizhi-qa',{recursive:true});
   assert.equal((await page.goto(base)).status(),200);
-  await page.waitForSelector('.branch-card');
-  assert.equal(await page.locator('.branch-card').count(),10);
-  const count=await page.locator('.leaf').count();assert(count>=45);
+  await page.waitForSelector('.chapter-leaf');
+  assert.equal(await page.locator('.chapter-leaf').count(),10);
+  const count=Number((await page.locator('#total-label').textContent()).match(/\d+/)[0]);assert(count>=45);
+  assert.equal(await page.locator('.branch-description').count(),0);
+  await page.locator('#branch-fundamentals').click();
+  assert.equal(await page.locator('#reader h2').textContent(),'LLM 基础原理');
+  assert.equal(await page.locator('.overview-item').count(),7);
+  await page.locator('#reader-close').click();
   await page.screenshot({path:'/tmp/zhizhi-qa/desktop.png',fullPage:true});
   await page.locator('#search-open').click();
   await page.locator('#search-input').fill('RAG');
@@ -48,9 +53,12 @@ const {mkdir}=require('node:fs/promises');
   await download.saveAs('/tmp/zhizhi-qa/progress.json');
   await page.locator('#import-file').setInputFiles('/tmp/zhizhi-qa/progress.json');
   assert.match(await page.locator('#toast').textContent(),/合并/);
-  for(const width of [360,390,768,1024,1440]){
+  for(const width of [360,390,768,1024,1108,1440]){
     await page.setViewportSize({width,height:900});
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`horizontal overflow at ${width}`);
+    await page.locator('#fit-map').click();
+    const boxes=await page.locator('.chapter-leaf').evaluateAll(leaves=>leaves.map(leaf=>{const r=leaf.getBoundingClientRect();return {id:leaf.id,x:r.x,y:r.y,right:r.right,bottom:r.bottom};}));
+    for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++){const a=boxes[i],b=boxes[j];assert(!(a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y),`overlap at ${width}: ${a.id}/${b.id}`);}
   }
   await page.setViewportSize({width:390,height:844});
   await page.screenshot({path:'/tmp/zhizhi-qa/mobile.png',fullPage:true});
@@ -62,6 +70,6 @@ const {mkdir}=require('node:fs/promises');
   await page.goto(base+'#node/retry');
   assert.equal(await page.locator('#reader h2').textContent(),'重试与幂等');
   assert.deepEqual(errors,[]);
-  console.log(JSON.stringify({nodes:count,branches:10,search:'passed',quiz:'passed',persistence:'passed',bookmarks:'passed',routes:'passed',list:'passed',zoom:'passed',importExport:'passed',deepLink:'passed',responsive:[360,390,768,1024,1440],runtimeErrors:errors},null,2));
+  console.log(JSON.stringify({nodes:count,branches:10,search:'passed',quiz:'passed',persistence:'passed',bookmarks:'passed',routes:'passed',list:'passed',zoom:'passed',importExport:'passed',deepLink:'passed',responsive:[360,390,768,1024,1108,1440],chapterOverlap:'none',runtimeErrors:errors},null,2));
   await browser.close();
 })().catch(error=>{console.error(error);process.exit(1);});

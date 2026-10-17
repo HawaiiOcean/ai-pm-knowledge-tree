@@ -20,16 +20,16 @@ export const sources = {
 };
 
 export const groups = [
-  {id:'fundamentals', title:'LLM 基础原理', en:'LLM FUNDAMENTALS', color:'#728b57', symbol:'⌁', x:525,y:1120, number:'01', description:'从一句话如何生成，建立正确的模型直觉。', question:'为什么模型会说得流畅，却不一定说得正确？', source:'transformer'},
-  {id:'training', title:'模型与训练', en:'MODEL & TRAINING', color:'#a28c65', symbol:'◈', x:1010,y:1080, number:'02', description:'理解能力从哪里来，选型时才有判断依据。', question:'模型更大、训练更多，就一定更适合业务吗？', source:'dpo'},
-  {id:'context', title:'上下文工程', en:'CONTEXT ENGINEERING', color:'#7a976c', symbol:'≋', x:555,y:850, number:'03', description:'让模型在正确的时刻，看到正确的信息。', question:'一次请求里，哪些信息值得占用上下文？', source:'context'},
-  {id:'rag', title:'知识与检索', en:'RETRIEVAL-AUGMENTED GENERATION', color:'#61968a', symbol:'▤', x:95,y:770, number:'04', description:'把企业知识，变成有依据的回答。', question:'回答错误，是没找到资料，还是没用好资料？', source:'rag'},
-  {id:'agent', title:'Agent 与行动', en:'AGENTS & TOOLS', color:'#b28c69', symbol:'↗', x:1015,y:770, number:'05', description:'从回答问题，走向真正完成一件事。', question:'哪些决策交给模型，哪些步骤应该固定？', source:'agents'},
-  {id:'evaluation', title:'评测与迭代', en:'EVALUATION', color:'#85975e', symbol:'✓', x:80,y:480, number:'06', description:'定义什么是好，才能知道怎样变得更好。', question:'换模型之后，质量提升有证据吗？', source:'eval'},
-  {id:'engineering', title:'工程与交付', en:'AI ENGINEERING', color:'#7c92a3', symbol:'⚙', x:1030,y:480, number:'07', description:'把一次演示，变成稳定可用的日常服务。', question:'体验、速度和成本，怎样一起衡量？', source:'web'},
-  {id:'safety', title:'安全与治理', en:'SAFETY & GOVERNANCE', color:'#9e8a9e', symbol:'◇', x:535,y:465, number:'08', description:'让能力有边界，让每一次行动可控。', question:'即使模型判断错了，系统还能守住什么？', source:'security'},
-  {id:'multimodal', title:'多模态与推理', en:'MULTIMODAL & REASONING', color:'#aa9b68', symbol:'✧', x:200,y:195, number:'09', description:'看、听、推理，让产品拥有更丰富的感知。', question:'增加一种模态，解决了哪一个真实问题？', source:'vision'},
-  {id:'product', title:'AI 产品设计', en:'PRODUCT & POSSIBILITIES', color:'#688466', symbol:'♧', x:835,y:175, number:'10', description:'让技术能力，长成用户愿意使用的产品。', question:'用户需要一个回答，还是一个已完成的结果？', source:'ux'},
+  {id:'fundamentals', title:'LLM 基础原理', en:'LLM FUNDAMENTALS', color:'#728b57', symbol:'⌁', number:'01', description:'从一句话如何生成，建立正确的模型直觉。', question:'为什么模型会说得流畅，却不一定说得正确？', source:'transformer'},
+  {id:'training', title:'模型与训练', en:'MODEL & TRAINING', color:'#a28c65', symbol:'◈', number:'02', description:'理解能力从哪里来，选型时才有判断依据。', question:'模型更大、训练更多，就一定更适合业务吗？', source:'dpo'},
+  {id:'context', title:'上下文工程', en:'CONTEXT ENGINEERING', color:'#7a976c', symbol:'≋', number:'03', description:'让模型在正确的时刻，看到正确的信息。', question:'一次请求里，哪些信息值得占用上下文？', source:'context'},
+  {id:'rag', title:'知识与检索', en:'RETRIEVAL-AUGMENTED GENERATION', color:'#61968a', symbol:'▤', number:'04', description:'把企业知识，变成有依据的回答。', question:'回答错误，是没找到资料，还是没用好资料？', source:'rag'},
+  {id:'agent', title:'Agent 与行动', en:'AGENTS & TOOLS', color:'#b28c69', symbol:'↗', number:'05', description:'从回答问题，走向真正完成一件事。', question:'哪些决策交给模型，哪些步骤应该固定？', source:'agents'},
+  {id:'evaluation', title:'评测与迭代', en:'EVALUATION', color:'#85975e', symbol:'✓', number:'06', description:'定义什么是好，才能知道怎样变得更好。', question:'换模型之后，质量提升有证据吗？', source:'eval'},
+  {id:'engineering', title:'工程与交付', en:'AI ENGINEERING', color:'#7c92a3', symbol:'⚙', number:'07', description:'把一次演示，变成稳定可用的日常服务。', question:'体验、速度和成本，怎样一起衡量？', source:'web'},
+  {id:'safety', title:'安全与治理', en:'SAFETY & GOVERNANCE', color:'#9e8a9e', symbol:'◇', number:'08', description:'让能力有边界，让每一次行动可控。', question:'即使模型判断错了，系统还能守住什么？', source:'security'},
+  {id:'multimodal', title:'多模态与推理', en:'MULTIMODAL & REASONING', color:'#aa9b68', symbol:'✧', number:'09', description:'看、听、推理，让产品拥有更丰富的感知。', question:'增加一种模态，解决了哪一个真实问题？', source:'vision'},
+  {id:'product', title:'AI 产品设计', en:'PRODUCT & POSSIBILITIES', color:'#688466', symbol:'♧', number:'10', description:'让技术能力，长成用户愿意使用的产品。', question:'用户需要一个回答，还是一个已完成的结果？', source:'ux'},
 ];
 
 function n(id,group,title,en,definition,example,pm,pitfall,question,options,answer,explanation,flow=[],related=[],source){
